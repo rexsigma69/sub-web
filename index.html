@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <title>מחשבון כללי</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      direction: rtl;
+    }
+
+    h1 {
+      margin-bottom: 20px;
+    }
+
+    .button-container {
+      margin-bottom: 30px;
+    }
+
+    .nav-button {
+      width: 220px;
+      margin: 10px;
+      font-size: 18px;
+      padding: 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 6px;
+    }
+
+    .nav-button:hover {
+      background-color: #0056b3;
+    }
+
+    .calculator {
+      display: none;
+      max-width: 500px;
+      margin: 0 auto 40px;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    input, button {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      text-align: right;
+    }
+
+    .calc-button {
+      background-color: #28a745;
+      color: white;
+      border: none;
+    }
+
+    .calc-button:hover {
+      background-color: #218838;
+    }
+
+    .result {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>בחר מחשבון</h1>
+  <div class="button-container">
+    <button class="nav-button" onclick="showCalc('battery')">🔋 טעינת סוללה</button>
+    <button class="nav-button" onclick="showCalc('percent')">📊 אחוזים</button>
+    <button class="nav-button" onclick="showCalc('temp')">🌡️ טמפרטורה</button>
+  </div>
+
+  <!-- Battery Calculator -->
+  <div id="batteryCalc" class="calculator">
+    <h2>מחשבון טעינת סוללה</h2>
+    <input type="number" id="batteryVoltageInput" placeholder="מה המתח של הסוללה? (36, 48, 52, 60, 72)">
+    <input type="number" id="currentVoltageInput" placeholder="מה המתח הנוכחי?">
+    <input type="number" id="ampInput" placeholder="כמה אמפר המטען?">
+    <input type="number" id="ahInput" placeholder="כמה אמפר-שעה יש בסוללה?">
+    <button class="calc-button" onclick="calculateBattery()">חשב</button>
+    <div class="result" id="batteryResult"></div>
+  </div>
+
+  <!-- Percentage Calculator -->
+  <div id="percentCalc" class="calculator">
+    <h2>מחשבון אחוזים</h2>
+
+    <h4>כמה שווים X% מתוך סכום Y?</h4>
+    <input type="number" id="percent1" placeholder="אחוז">
+    <input type="number" id="total1" placeholder="סכום">
+    <button class="calc-button" onclick="calc1()">חשב</button>
+    <div class="result" id="result1"></div>
+
+    <h4>מה אחוז X מתוך Y?</h4>
+    <input type="number" id="value2" placeholder="סכום">
+    <input type="number" id="total2" placeholder="מתוך סכום">
+    <button class="calc-button" onclick="calc2()">חשב</button>
+    <div class="result" id="result2"></div>
+
+    <h4>אם X זה Y%, כמה זה 100%?</h4>
+    <input type="number" id="value3" placeholder="סכום">
+    <input type="number" id="percent3" placeholder="אחוז">
+    <button class="calc-button" onclick="calc3()">חשב</button>
+    <div class="result" id="result3"></div>
+  </div>
+
+  <!-- Temperature Converter -->
+  <div id="tempCalc" class="calculator">
+    <h2>ממיר טמפרטורה</h2>
+    <input type="number" id="degrees" placeholder="הכנס טמפרטורה">
+
+    <div class="button-container">
+      <button class="nav-button" onclick="convertTemp('FC')">להמיר לצלזיוס</button>
+      <button class="nav-button" onclick="convertTemp('CF')">להמיר לפרנהייט</button>
+    </div>
+
+    <div class="result" id="tempResult"></div>
+  </div>
+
+  <script>
+    function showCalc(type) {
+      document.getElementById("batteryCalc").style.display = type === 'battery' ? 'block' : 'none';
+      document.getElementById("percentCalc").style.display = type === 'percent' ? 'block' : 'none';
+      document.getElementById("tempCalc").style.display = type === 'temp' ? 'block' : 'none';
+    }
+
+    function calculateBattery() {
+      const batteryVoltage = parseFloat(document.getElementById("batteryVoltageInput").value);
+      let currentVoltage = parseFloat(document.getElementById("currentVoltageInput").value);
+      const amp = parseFloat(document.getElementById("ampInput").value);
+      let ah = parseFloat(document.getElementById("ahInput").value);
+      let percent = 0;
+      let distanceMultiplier = 2.7;
+
+      if (batteryVoltage === 36) {
+        currentVoltage -= 30;
+        currentVoltage /= 0.12;
+        percent = Math.floor(currentVoltage);
+      } else if (batteryVoltage === 48) {
+        currentVoltage -= 39;
+        currentVoltage *= 6.4;
+        percent = Math.floor(currentVoltage);
+      } else if (batteryVoltage === 52) {
+        currentVoltage -= 42;
+        currentVoltage /= 0.168;
+        percent = Math.floor(currentVoltage);
+      } else if (batteryVoltage === 60) {
+        currentVoltage -= 48;
+        currentVoltage /= 0.192;
+        percent = Math.floor(currentVoltage);
+        distanceMultiplier = 2.4;
+      } else if (batteryVoltage === 72) {
+        currentVoltage -= 60;
+        currentVoltage /= 0.24;
+        percent = Math.floor(currentVoltage);
+        distanceMultiplier = 2.2;
+      }
+
+      const resultDiv = document.getElementById("batteryResult");
+      resultDiv.innerHTML = `<p>הסוללה טעונה ב-${percent}%</p>`;
+
+      ah /= 100.0;
+      const remainingAh = ah * (100 - percent);
+      const chargeTime = remainingAh / amp;
+      const hours = Math.floor(chargeTime);
+      const minutes = Math.floor((chargeTime % 1) * 60);
+
+      resultDiv.innerHTML += minutes > 0
+        ? `<p>יש לטעון כ-${hours} שעות ו-${minutes} דקות</p>`
+        : `<p>יש לטעון כ-${hours} שעות</p>`;
+
+      const distance = remainingAh * distanceMultiplier;
+      resultDiv.innerHTML += `<p>מרחק משוער: ${distance.toFixed(2)} ק"מ</p>`;
+    }
+
+    function calc1() {
+      const p = parseFloat(document.getElementById("percent1").value);
+      const t = parseFloat(document.getElementById("total1").value);
+      const res = (p / 100) * t;
+      document.getElementById("result1").innerText = isNaN(res) ? 'נא להזין ערכים תקינים' : `תוצאה: ${res}`;
+    }
+
+    function calc2() {
+      const v = parseFloat(document.getElementById("value2").value);
+      const t = parseFloat(document.getElementById("total2").value);
+      const res = (v / t) * 100;
+      document.getElementById("result2").innerText = isNaN(res) ? 'נא להזין ערכים תקינים' : `תוצאה: ${res.toFixed(2)}%`;
+    }
+
+    function calc3() {
+      const v = parseFloat(document.getElementById("value3").value);
+      const p = parseFloat(document.getElementById("percent3").value);
+      const res = (v * 100) / p;
+      document.getElementById("result3").innerText = isNaN(res) ? 'נא להזין ערכים תקינים' : `תוצאה: ${res}`;
+    }
+
+    function convertTemp(mode) {
+      const deg = parseFloat(document.getElementById("degrees").value);
+      const resultDiv = document.getElementById("tempResult");
+
+      if (isNaN(deg)) {
+        resultDiv.innerText = "נא להזין מספר תקין.";
+        return;
+      }
+
+      let result;
+      if (mode === "FC") {
+        result = (deg - 32) * 5 / 9;
+        resultDiv.innerText = `${deg}° פרנהייט = ${result.toFixed(2)}° צלזיוס`;
+      } else {
+        result = (deg * 9 / 5) + 32;
+        resultDiv.innerText = `${deg}° צלזיוס = ${result.toFixed(2)}° פרנהייט`;
+      }
+    }
+  </script>
+</body>
+</html>
